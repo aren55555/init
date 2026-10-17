@@ -1,0 +1,47 @@
+# Tools and apps the installer offers. Each entry names its package for each
+# package manager, and is offered on a platform only if one of that platform's
+# keys is set (first match wins):
+#
+#   macOS: cask, brew    Arch/Omarchy: pacman, aur    Ubuntu/WSL: apt
+#
+# `script` is a fallback shell command on any platform; `check` is the command
+# whose presence means it's already installed (defaults to `name`).
+# [[app]] entries are GUI apps and are never offered on WSL.
+
+[[tool]]
+name = "git"
+brew = "git"
+pacman = "git"
+apt = "git"
+
+[[tool]]
+name = "gh"
+brew = "gh"
+pacman = "github-cli"
+apt = "gh"
+
+# macOS already ships zsh as its default shell.
+[[tool]]
+name = "zsh"
+pacman = "zsh"
+apt = "zsh"
+
+[[tool]]
+name = "mise"
+script = "curl -fsSL https://mise.run | sh"
+
+[[tool]]
+name = "zoxide"
+brew = "zoxide"
+pacman = "zoxide"
+apt = "zoxide"
+
+[[app]]
+name = "Google Chrome"
+cask = "google-chrome"
+aur = "google-chrome"
+
+[[app]]
+name = "1Password"
+cask = "1password"
+aur = "1password"

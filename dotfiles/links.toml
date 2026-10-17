@@ -1,0 +1,5 @@
+# Symlinks the installer creates. src is relative to the repo root; dst may start with ~/.
+
+[[link]]
+src = "dotfiles/zsh/.zshrc"
+dst = "~/.zshrc"
