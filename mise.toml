@@ -1,0 +1,17 @@
+# Dev tools for working on this repo (not used by bootstrap.sh). Run `mise trust && mise install` once.
+# Every download is pinned by URL and sha256 in mise.lock; regenerate it with
+# `mise lock just aqua:cirruslabs/tart` after changing a version.
+
+[settings]
+locked = true   # refuse to install anything mise.lock doesn't pin
+paranoid = true
+
+[tools]
+just = "1.58.0"
+# Tart publishes no build attestations, so also require the app to be signed
+# by Cirrus Labs' Developer ID (team 9M2P8L4D89) and notarized by Apple.
+"aqua:cirruslabs/tart" = { version = "2.41.1", os = ["macos"], postinstall = '''
+app="$MISE_TOOL_INSTALL_PATH/tart.app" &&
+codesign --verify --strict -R='anchor apple generic and certificate leaf[subject.OU] = "9M2P8L4D89"' "$app" &&
+spctl --assess --type exec "$app"
+''' }

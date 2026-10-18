@@ -18,6 +18,15 @@ say() { printf '==> %s\n' "$*"; }
 die() { printf 'bootstrap: %s\n' "$*" >&2; exit 1; }
 has() { command -v "$1" >/dev/null 2>&1; }
 
+brew_shellenv() {
+	for brew in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+		if [ -x "$brew" ]; then
+			eval "$("$brew" shellenv)"
+			return
+		fi
+	done
+}
+
 main() {
 	if [ ! -t 0 ] && (: </dev/tty) 2>/dev/null; then
 		exec </dev/tty
@@ -41,16 +50,13 @@ main() {
 
 	case $os in
 	macos)
+		# Homebrew may be installed but not on PATH in a shell that hasn't loaded ~/.zshrc.
+		brew_shellenv
 		if ! has brew; then
 			say "Installing Homebrew (this also installs the Xcode Command Line Tools)"
 			/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+			brew_shellenv
 		fi
-		for brew in /opt/homebrew/bin/brew /usr/local/bin/brew; do
-			if [ -x "$brew" ]; then
-				eval "$("$brew" shellenv)"
-				break
-			fi
-		done
 		;;
 	arch)
 		if ! has git || ! has curl; then
@@ -85,9 +91,13 @@ main() {
 			say "Installing mise"
 			curl -fsSL https://mise.run | sh
 		fi
-		say "Installing Go with mise"
-		mise use -g go@latest
-		set -- mise exec -- go run ./cmd/init "$@"
+		# Run mise from $HOME so the repo's mise.toml (dev tools only) isn't
+		# loaded: it would ask to be trusted and install tools we don't need here.
+		if ! mise -C "$HOME" which go >/dev/null 2>&1; then
+			say "Installing Go with mise"
+			mise -C "$HOME" use -g go@latest
+		fi
+		set -- "$(mise -C "$HOME" which go)" run ./cmd/init "$@"
 	fi
 	say "Starting installer"
 	exec "$@"

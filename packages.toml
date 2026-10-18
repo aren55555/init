@@ -6,7 +6,7 @@
 #
 # `script` is a fallback shell command on any platform; `check` is the command
 # whose presence means it's already installed (defaults to `name`).
-# [[app]] entries are GUI apps and are never offered on WSL.
+# [[app]] (GUI apps) and [[font]] entries are never offered on WSL.
 
 [[tool]]
 name = "git"
@@ -45,3 +45,121 @@ aur = "google-chrome"
 name = "1Password"
 cask = "1password"
 aur = "1password"
+
+# macOS only: the cask installs the `claude` CLI. @latest gets releases sooner than `claude-code`.
+[[tool]]
+name = "Claude Code"
+cask = "claude-code@latest"
+check = "claude"
+
+[[app]]
+name = "Ghostty"
+cask = "ghostty"
+pacman = "ghostty"
+
+# Microsoft's build on both (Arch's official `code` package is the open-source
+# build without the Microsoft extension marketplace or Settings Sync).
+[[app]]
+name = "Visual Studio Code"
+cask = "visual-studio-code"
+aur = "visual-studio-code-bin"
+
+[[app]]
+name = "Signal"
+cask = "signal"
+pacman = "signal-desktop"
+
+# macOS only: no Linux builds.
+[[app]]
+name = "Fork"
+cask = "fork"
+
+[[app]]
+name = "Claude"
+cask = "claude"
+
+# macOS-only apps.
+
+# Installs from a .pkg, so it asks for an admin password.
+[[app]]
+name = "GPG Suite"
+cask = "gpg-suite"
+
+[[app]]
+name = "Rectangle"
+cask = "rectangle"
+
+[[app]]
+name = "Notion"
+cask = "notion"
+
+[[app]]
+name = "Notion Calendar"
+cask = "notion-calendar"
+
+# Installs from a .pkg, so it asks for an admin password.
+[[app]]
+name = "Mullvad VPN"
+cask = "mullvad-vpn"
+
+[[app]]
+name = "Alfred"
+cask = "alfred"
+
+[[app]]
+name = "Thaw"
+cask = "thaw"
+
+[[app]]
+name = "Todoist"
+cask = "todoist-app"
+
+[[app]]
+name = "Raindrop.io"
+cask = "raindropio"
+
+[[app]]
+name = "Pocket Casts"
+cask = "pocket-casts"
+
+[[app]]
+name = "Spotify"
+cask = "spotify"
+
+# Fonts are never offered on WSL: the Windows terminal renders them.
+# Arch only gets the ones in its official repos.
+
+[[font]]
+name = "Amatic SC"
+cask = "font-amatic-sc"
+
+[[font]]
+name = "Averia Libre"
+cask = "font-averia-libre"
+
+[[font]]
+name = "Bitstream Vera"
+cask = "font-bitstream-vera"
+pacman = "ttf-bitstream-vera"
+
+[[font]]
+name = "Bitstream Vera Sans Mono Nerd Font"
+cask = "font-bitstream-vera-sans-mono-nerd-font"
+pacman = "ttf-bitstream-vera-mono-nerd"
+
+[[font]]
+name = "DM Mono"
+cask = "font-dm-mono"
+
+[[font]]
+name = "Hack Nerd Font"
+cask = "font-hack-nerd-font"
+pacman = "ttf-hack-nerd"
+
+[[font]]
+name = "Intel One Mono"
+cask = "font-intel-one-mono"
+
+[[font]]
+name = "Pangolin"
+cask = "font-pangolin"

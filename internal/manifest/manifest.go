@@ -34,13 +34,23 @@ type Entry struct {
 type Manifest struct {
 	Tools []Entry `toml:"tool"`
 	Apps  []Entry `toml:"app"`
+	Fonts []Entry `toml:"font"`
 }
+
+// Kind is which manifest table an item came from.
+type Kind string
+
+const (
+	Tool Kind = "tool"
+	App  Kind = "app"
+	Font Kind = "font"
+)
 
 // Item is an entry resolved for one platform. For Script items Pkg holds the
 // shell command and Check the command whose presence means it's installed.
 type Item struct {
 	Name   string
-	App    bool
+	Kind   Kind
 	Method Method
 	Pkg    string
 	Check  string
@@ -54,22 +64,23 @@ func Load(path string) (*Manifest, error) {
 	return &m, nil
 }
 
-// Resolve returns the items installable on p, in manifest order. Apps are
-// skipped on WSL, where GUI apps belong on the Windows side.
+// Resolve returns the items installable on p: tools, then apps, then fonts,
+// each in manifest order. Apps and fonts are skipped on WSL, where they
+// belong on the Windows side.
 func (m *Manifest) Resolve(p platform.Platform) []Item {
 	var items []Item
-	for _, e := range m.Tools {
-		if it, ok := resolve(e, p); ok {
-			items = append(items, it)
-		}
-	}
-	if !p.WSL {
-		for _, e := range m.Apps {
+	add := func(entries []Entry, kind Kind) {
+		for _, e := range entries {
 			if it, ok := resolve(e, p); ok {
-				it.App = true
+				it.Kind = kind
 				items = append(items, it)
 			}
 		}
+	}
+	add(m.Tools, Tool)
+	if !p.WSL {
+		add(m.Apps, App)
+		add(m.Fonts, Font)
 	}
 	return items
 }

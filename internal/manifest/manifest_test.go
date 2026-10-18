@@ -16,29 +16,34 @@ var testManifest = &Manifest{
 	Apps: []Entry{
 		{Name: "Google Chrome", Cask: "google-chrome", AUR: "google-chrome"},
 	},
+	Fonts: []Entry{
+		{Name: "Hack Nerd Font", Cask: "font-hack-nerd-font", Pacman: "ttf-hack-nerd"},
+	},
 }
 
 func TestResolve(t *testing.T) {
-	mise := Item{Name: "mise", Method: Script, Pkg: "curl -fsSL https://mise.run | sh", Check: "mise"}
+	mise := Item{Name: "mise", Kind: Tool, Method: Script, Pkg: "curl -fsSL https://mise.run | sh", Check: "mise"}
 	tests := []struct {
 		name string
 		p    platform.Platform
 		want []Item
 	}{
 		{"macos", platform.Platform{OS: platform.MacOS}, []Item{
-			{Name: "gh", Method: Brew, Pkg: "gh", Check: "gh"},
+			{Name: "gh", Kind: Tool, Method: Brew, Pkg: "gh", Check: "gh"},
 			mise,
-			{Name: "Google Chrome", App: true, Method: Cask, Pkg: "google-chrome", Check: "Google Chrome"},
+			{Name: "Google Chrome", Kind: App, Method: Cask, Pkg: "google-chrome", Check: "Google Chrome"},
+			{Name: "Hack Nerd Font", Kind: Font, Method: Cask, Pkg: "font-hack-nerd-font", Check: "Hack Nerd Font"},
 		}},
 		{"arch", platform.Platform{OS: platform.Arch}, []Item{
-			{Name: "gh", Method: Pacman, Pkg: "github-cli", Check: "gh"},
-			{Name: "zsh", Method: Pacman, Pkg: "zsh", Check: "zsh"},
+			{Name: "gh", Kind: Tool, Method: Pacman, Pkg: "github-cli", Check: "gh"},
+			{Name: "zsh", Kind: Tool, Method: Pacman, Pkg: "zsh", Check: "zsh"},
 			mise,
-			{Name: "Google Chrome", App: true, Method: AUR, Pkg: "google-chrome", Check: "Google Chrome"},
+			{Name: "Google Chrome", Kind: App, Method: AUR, Pkg: "google-chrome", Check: "Google Chrome"},
+			{Name: "Hack Nerd Font", Kind: Font, Method: Pacman, Pkg: "ttf-hack-nerd", Check: "Hack Nerd Font"},
 		}},
-		{"wsl skips apps", platform.Platform{OS: platform.Ubuntu, WSL: true}, []Item{
-			{Name: "gh", Method: Apt, Pkg: "gh", Check: "gh"},
-			{Name: "zsh", Method: Apt, Pkg: "zsh", Check: "zsh"},
+		{"wsl skips apps and fonts", platform.Platform{OS: platform.Ubuntu, WSL: true}, []Item{
+			{Name: "gh", Kind: Tool, Method: Apt, Pkg: "gh", Check: "gh"},
+			{Name: "zsh", Kind: Tool, Method: Apt, Pkg: "zsh", Check: "zsh"},
 			mise,
 		}},
 	}

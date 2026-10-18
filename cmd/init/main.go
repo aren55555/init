@@ -100,11 +100,7 @@ func run(dryRun, yes bool) error {
 func choose(items []manifest.Item) ([]manifest.Item, error) {
 	opts := make([]huh.Option[int], len(items))
 	for i, it := range items {
-		kind := "tool"
-		if it.App {
-			kind = "app"
-		}
-		opts[i] = huh.NewOption(fmt.Sprintf("%s (%s via %s)", it.Name, kind, it.Method), i).Selected(true)
+		opts[i] = huh.NewOption(fmt.Sprintf("%s (%s via %s)", it.Name, it.Kind, it.Method), i).Selected(true)
 	}
 	var picked []int
 	err := huh.NewMultiSelect[int]().

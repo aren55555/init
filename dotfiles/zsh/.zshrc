@@ -14,7 +14,7 @@ esac
 unset _init_os
 
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"  # needs a Powerline/Nerd font in the terminal (e.g. Hack Nerd Font)
 plugins=(git)
 [[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
