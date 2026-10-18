@@ -80,6 +80,10 @@ main() {
 		say "Cloning $REPO_URL into $INIT_DIR"
 		mkdir -p "$(dirname "$INIT_DIR")"
 		git clone "$REPO_URL" "$INIT_DIR"
+	elif [ -z "$(git -C "$INIT_DIR" status --porcelain 2>/dev/null)" ]; then
+		# A clone from an earlier run would otherwise keep running old code.
+		say "Updating $INIT_DIR"
+		git -C "$INIT_DIR" pull --ff-only || say "Warning: could not update $INIT_DIR; running it as is"
 	fi
 	cd "$INIT_DIR"
 
