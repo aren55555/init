@@ -83,6 +83,15 @@ main() {
 	fi
 	cd "$INIT_DIR"
 
+	# Show which commit runs, and warn if GitHub's main differs: an existing
+	# clone is never updated, so a re-run can be on old code.
+	head=$(git rev-parse HEAD 2>/dev/null || true)
+	say "Running $INIT_DIR at commit $(printf '%.12s' "${head:-unknown}")"
+	latest=$(git ls-remote "$REPO_URL" refs/heads/main 2>/dev/null | cut -f1 || true)
+	if [ -n "$head" ] && [ -n "$latest" ] && [ "$head" != "$latest" ]; then
+		say "Warning: main on GitHub is at $(printf '%.12s' "$latest"); to update: git -C \"$INIT_DIR\" pull"
+	fi
+
 	if has go; then
 		set -- go run ./cmd/init "$@"
 	else
