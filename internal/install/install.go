@@ -94,10 +94,12 @@ func Installed(it manifest.Item) bool {
 
 func Install(r *Runner, it manifest.Item) error {
 	switch it.Method {
+	// HOMEBREW_NO_ASK: Homebrew 7 otherwise stops at "Do you want to proceed with
+	// the installation? [y/n]" whenever the plan pulls in dependencies.
 	case manifest.Brew:
-		return r.Run("brew", "install", it.Pkg)
+		return r.Run("env", "HOMEBREW_NO_ASK=1", "brew", "install", it.Pkg)
 	case manifest.Cask:
-		return r.Run("brew", "install", "--cask", it.Pkg)
+		return r.Run("env", "HOMEBREW_NO_ASK=1", "brew", "install", "--cask", it.Pkg)
 	case manifest.Pacman:
 		return r.Sudo("pacman", "-S", "--needed", "--noconfirm", it.Pkg)
 	case manifest.AUR:

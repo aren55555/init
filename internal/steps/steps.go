@@ -14,15 +14,17 @@ import (
 	"github.com/aren55555/init/internal/manifest"
 )
 
-// Packages installs each item that isn't already installed and returns the names of those that failed.
-func Packages(r *install.Runner, items []manifest.Item) []string {
-	var failed []string
+// Packages installs each item that isn't already installed and returns the
+// names of those that failed and of those skipped because their package
+// manager wasn't found.
+func Packages(r *install.Runner, items []manifest.Item) (failed, skipped []string) {
 	for _, it := range items {
 		switch {
 		case install.Installed(it):
 			r.Logf("✓ %s already installed", it.Name)
 		case !install.Available(it):
 			r.Logf("- skipping %s: %s not found", it.Name, install.Tool(it))
+			skipped = append(skipped, it.Name)
 		default:
 			r.Logf("→ installing %s", it.Name)
 			if err := install.Install(r, it); err != nil {
@@ -31,7 +33,7 @@ func Packages(r *install.Runner, items []manifest.Item) []string {
 			}
 		}
 	}
-	return failed
+	return failed, skipped
 }
 
 const ohMyZshInstaller = "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"

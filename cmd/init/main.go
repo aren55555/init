@@ -57,6 +57,9 @@ func run(dryRun, yes bool) error {
 	}
 
 	if ok, err := confirm(fmt.Sprintf("Configure this machine as %s?", p)); err != nil || !ok {
+		if err == nil {
+			r.Logf("Nothing changed.")
+		}
 		return err
 	}
 
@@ -65,8 +68,11 @@ func run(dryRun, yes bool) error {
 		if items, err = choose(items); err != nil {
 			return err
 		}
+		if len(items) == 0 {
+			r.Logf("No packages selected.")
+		}
 	}
-	failed := steps.Packages(r, items)
+	failed, skipped := steps.Packages(r, items)
 
 	for _, s := range []struct {
 		name, question string
@@ -89,6 +95,9 @@ func run(dryRun, yes bool) error {
 		}
 	}
 
+	if len(skipped) > 0 {
+		r.Logf("⚠ skipped because their package manager wasn't found: %s", strings.Join(skipped, ", "))
+	}
 	if len(failed) > 0 {
 		return errors.New("failed: " + strings.Join(failed, ", "))
 	}
