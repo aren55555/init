@@ -1,7 +1,9 @@
 package manifest
 
 import (
+	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/aren55555/init/internal/platform"
@@ -53,6 +55,25 @@ func TestResolve(t *testing.T) {
 				t.Errorf("got  %+v\nwant %+v", got, tt.want)
 			}
 		})
+	}
+}
+
+// TestReadmeInventory keeps the README's package table in sync with packages.toml.
+func TestReadmeInventory(t *testing.T) {
+	m, err := Load("../../packages.toml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	readme, err := os.ReadFile("../../README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entries := range [][]Entry{m.Tools, m.Apps, m.Fonts} {
+		for _, e := range entries {
+			if !strings.Contains(string(readme), "\n| "+e.Name+" ") {
+				t.Errorf("README.md has no table row for %q", e.Name)
+			}
+		}
 	}
 }
 
