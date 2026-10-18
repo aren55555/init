@@ -22,7 +22,8 @@ Or from a checkout: `./bootstrap.sh`. `init.aren55555.com` redirects to [`bootst
 2. lets you pick from the tools, apps and fonts in `packages.toml` for this platform (all pre-selected),
 3. installs Oh My Zsh,
 4. symlinks dotfiles into `$HOME`, backing up anything it replaces to `~/.init-backup/<timestamp>/`,
-5. makes zsh the login shell.
+5. makes zsh the login shell,
+6. on macOS, turns off natural scrolling and shake-to-locate, sets the fastest key repeat, and moves ⌘Space from Spotlight to Alfred (if Alfred is installed).
 
 Every step skips work that's already done, so re-running is safe. Flags: `--dry-run` (print without changing anything), `--yes` (no prompts).
 

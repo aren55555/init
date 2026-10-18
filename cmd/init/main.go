@@ -52,10 +52,17 @@ func run(dryRun, yes bool) error {
 			return true, nil
 		}
 		ok := true
-		err := huh.NewConfirm().Title(title).Value(&ok).Run()
+		err := huh.NewConfirm().
+			Title(title).
+			Description("←/→ or y/n to choose, enter to confirm").
+			Value(&ok).
+			Run()
 		return ok, err
 	}
 
+	if !yes {
+		r.Logf("Interactive setup: answer each prompt with the keyboard (ctrl+c quits without changing anything).\n")
+	}
 	if ok, err := confirm(fmt.Sprintf("Configure this machine as %s?", p)); err != nil || !ok {
 		if err == nil {
 			r.Logf("Nothing changed.")
@@ -74,14 +81,20 @@ func run(dryRun, yes bool) error {
 	}
 	failed, skipped := steps.Packages(r, items)
 
-	for _, s := range []struct {
+	type step struct {
 		name, question string
 		fn             func() error
-	}{
+	}
+	setup := []step{
 		{"Oh My Zsh", "Install Oh My Zsh?", func() error { return steps.OhMyZsh(r, home) }},
 		{"dotfiles", "Link dotfiles into " + home + "?", func() error { return steps.Dotfiles(r, repo, home, time.Now()) }},
 		{"login shell", "Make zsh your login shell?", func() error { return steps.LoginShell(r) }},
-	} {
+	}
+	if p.OS == platform.MacOS {
+		setup = append(setup, step{"macOS settings", "Apply macOS settings (natural scrolling off, fastest key repeat, no shake-to-locate)?", func() error { return steps.MacSettings(r, steps.MacDefaults) }})
+		setup = append(setup, step{"Alfred hotkey", "Use ⌘Space for Alfred instead of Spotlight?", func() error { return steps.AlfredHotkey(r, home) }})
+	}
+	for _, s := range setup {
 		ok, err := confirm(s.question)
 		if err != nil {
 			return err
@@ -114,7 +127,10 @@ func choose(items []manifest.Item) ([]manifest.Item, error) {
 	var picked []int
 	err := huh.NewMultiSelect[int]().
 		Title("What should be installed?").
+		Description("Everything is checked. ↑/↓ move · space toggles · ctrl+a all/none · / filters · enter installs the checked items").
 		Options(opts...).
+		// Fixed height so the list scrolls and the key help below it stays on screen.
+		Height(min(len(opts)+4, 20)).
 		Value(&picked).
 		Run()
 	if err != nil {
